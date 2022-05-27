@@ -1,31 +1,14 @@
 from interactions.client.bot import Client
-import re
-import sys
-from asyncio import get_event_loop, iscoroutinefunction
-from functools import wraps
-from importlib import import_module
-from importlib.util import resolve_name
-from inspect import getmembers
-from logging import Logger
-from types import ModuleType
-from typing import Any, Callable, Coroutine, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
-from interactions.api import Cache
 from interactions.api import Item as Build
 from interactions.api import WebSocketClient as WSClient
-from interactions.api.error import InteractionException, JSONException
-from interactions.api.http.client import HTTPClient
-from interactions.api.models.flags import Intents, Permissions
+from interactions.api.models.flags import Permissions
 from interactions.api.models.guild import Guild
-from interactions.api.models.misc import MISSING, Image, Snowflake
-from interactions.api.models.presence import ClientPresence
-from interactions.api.models.team import Application
-from interactions.api.models.user import User
-from interactions.base import get_logger
-from interactions.client.decor import command
+from interactions.api.models.misc import MISSING, Snowflake
 from interactions.client.decor import component as _component
-from interactions.client.enums import ApplicationCommandType, Locale, OptionType
-from interactions.client.models.command import ApplicationCommand, Choice, Option
+from interactions.client.enums import ApplicationCommandType, Locale
+from interactions.client.models.command import ApplicationCommand, Option
 from interactions.client.models.component import Button, Modal, SelectMenu
 
 class ShardedClient(Client):
