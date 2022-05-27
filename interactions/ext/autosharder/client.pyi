@@ -1,0 +1,74 @@
+from interactions.client.bot import Client
+import re
+import sys
+from asyncio import get_event_loop, iscoroutinefunction
+from functools import wraps
+from importlib import import_module
+from importlib.util import resolve_name
+from inspect import getmembers
+from logging import Logger
+from types import ModuleType
+from typing import Any, Callable, Coroutine, Dict, List, Optional, Tuple, Union
+
+from interactions.api import Cache
+from interactions.api import Item as Build
+from interactions.api import WebSocketClient as WSClient
+from interactions.api.error import InteractionException, JSONException
+from interactions.api.http.client import HTTPClient
+from interactions.api.models.flags import Intents, Permissions
+from interactions.api.models.guild import Guild
+from interactions.api.models.misc import MISSING, Image, Snowflake
+from interactions.api.models.presence import ClientPresence
+from interactions.api.models.team import Application
+from interactions.api.models.user import User
+from interactions.base import get_logger
+from interactions.client.decor import command
+from interactions.client.decor import component as _component
+from interactions.client.enums import ApplicationCommandType, Locale, OptionType
+from interactions.client.models.command import ApplicationCommand, Choice, Option
+from interactions.client.models.component import Button, Modal, SelectMenu
+
+class ShardedClient(Client):
+    _clients: List[Client]
+    _shard_count: int
+    shards: List[List[int, int]]
+    def __init__(self, token: str, shard_count: int = MISSING, **kwargs): ...
+    async def _get_shard_count(self) -> int: ...
+    def generate_shard_list(self) -> None: ...
+    async def _login(self) -> None: ...
+    def command(
+        self,
+        *,
+        type: Optional[Union[str, int, ApplicationCommandType]] = ApplicationCommandType.CHAT_INPUT,
+        name: Optional[str] = MISSING,
+        description: Optional[str] = MISSING,
+        scope: Optional[Union[int, Guild, List[int], List[Guild]]] = MISSING,
+        options: Optional[List[Option]] = MISSING,
+        name_localizations: Optional[Dict[Union[str, Locale], str]] = MISSING,
+        description_localizations: Optional[Dict[Union[str, Locale], str]] = MISSING,
+        default_member_permissions: Optional[Union[int, Permissions]] = MISSING,
+        dm_permission: Optional[bool] = MISSING
+    ) -> Callable[..., Any]: ...
+    def message_command(
+        self,
+        *,
+        name: str,
+        scope: Optional[Union[int, Guild, List[int], List[Guild]]] = MISSING,
+        name_localizations: Optional[Dict[Union[str, Locale], str]] = MISSING,
+        default_member_permissions: Optional[Union[int, Permissions]] = MISSING,
+        dm_permission: Optional[bool] = MISSING
+    ) -> Callable[..., Any]: ...
+    def user_command(
+        self,
+        *,
+        name: str,
+        scope: Optional[Union[int, Guild, List[int], List[Guild]]] = MISSING,
+        name_localizations: Optional[Dict[Union[str, Locale], str]] = MISSING,
+        default_member_permissions: Optional[Union[int, Permissions]] = MISSING,
+        dm_permission: Optional[bool] = MISSING
+    ) -> Callable[..., Any]: ...
+    def component(self, component: Union[Button, SelectMenu, str]) -> Callable[..., Any]: ...
+    def autocomplete(
+        self, command: Union[ApplicationCommand, int, str, Snowflake], name: str
+    ) -> Callable[..., Any]: ...
+    def modal(self, modal: Union[Modal, str]) -> Callable[..., Any]: ...
