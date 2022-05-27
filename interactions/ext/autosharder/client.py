@@ -9,65 +9,65 @@ from interactions.client.models.component import Button, Modal, SelectMenu
 
 class _Client(Client):
     """This class is intended to only be used as a 'dummy' client without sync behaviour"""
-    
+
     def __init__(self, token: str, guild_cmds, global_cmds, **kwargs) -> None:
         super().__init__(token, **kwargs)
         self.__global_commands = global_cmds
         self.__guild_commands = guild_cmds
 
-    async def _ready(self) -> None: 
-         """ 
-         Prepares the client with an internal "ready" check to ensure 
-         that all conditions have been met in a chronological order: 
-  
-         .. code-block:: 
-  
-             CLIENT START 
-             |___ GATEWAY 
-             |   |___ READY 
-             |   |___ DISPATCH 
-             |___ SYNCHRONIZE 
-             |   |___ CACHE 
-             |___ DETECT DECORATOR 
-             |   |___ BUILD MODEL 
-             |   |___ SYNCHRONIZE 
-             |   |___ CALLBACK 
-             LOOP 
-         """ 
-         ready: bool = False 
-  
-         try: 
-             if self.me.flags is not None: 
-                 # This can be None. 
-                 if self._intents.GUILD_PRESENCES in self._intents and not ( 
-                     self.me.flags.GATEWAY_PRESENCE in self.me.flags 
-                     or self.me.flags.GATEWAY_PRESENCE_LIMITED in self.me.flags 
-                 ): 
-                     raise RuntimeError("Client not authorised for the GUILD_PRESENCES intent.") 
-                 if self._intents.GUILD_MEMBERS in self._intents and not ( 
-                     self.me.flags.GATEWAY_GUILD_MEMBERS in self.me.flags 
-                     or self.me.flags.GATEWAY_GUILD_MEMBERS_LIMITED in self.me.flags 
-                 ): 
-                     raise RuntimeError("Client not authorised for the GUILD_MEMBERS intent.") 
-                 if self._intents.GUILD_MESSAGES in self._intents and not ( 
-                     self.me.flags.GATEWAY_MESSAGE_CONTENT in self.me.flags 
-                     or self.me.flags.GATEWAY_MESSAGE_CONTENT_LIMITED in self.me.flags 
-                 ): 
-                     log.critical("Client not authorised for the MESSAGE_CONTENT intent.") 
-             elif self._intents.value != Intents.DEFAULT.value: 
-                 raise RuntimeError("Client not authorised for any privileged intents.") 
-  
-             self.__register_events() 
-  
-             await self.__register_name_autocomplete() 
-  
-             ready = True 
-         except Exception: 
-             log.exception("Could not prepare the client:") 
-         finally: 
-             if ready: 
-                 log.debug("Client is now ready.") 
-                 await self._login() 
+    async def _ready(self) -> None:
+         """
+         Prepares the client with an internal "ready" check to ensure
+         that all conditions have been met in a chronological order:
+
+         .. code-block::
+
+             CLIENT START
+             |___ GATEWAY
+             |   |___ READY
+             |   |___ DISPATCH
+             |___ SYNCHRONIZE
+             |   |___ CACHE
+             |___ DETECT DECORATOR
+             |   |___ BUILD MODEL
+             |   |___ SYNCHRONIZE
+             |   |___ CALLBACK
+             LOOP
+         """
+         ready: bool = False
+
+         try:
+             if self.me.flags is not None:
+                 # This can be None.
+                 if self._intents.GUILD_PRESENCES in self._intents and not (
+                     self.me.flags.GATEWAY_PRESENCE in self.me.flags
+                     or self.me.flags.GATEWAY_PRESENCE_LIMITED in self.me.flags
+                 ):
+                     raise RuntimeError("Client not authorised for the GUILD_PRESENCES intent.")
+                 if self._intents.GUILD_MEMBERS in self._intents and not (
+                     self.me.flags.GATEWAY_GUILD_MEMBERS in self.me.flags
+                     or self.me.flags.GATEWAY_GUILD_MEMBERS_LIMITED in self.me.flags
+                 ):
+                     raise RuntimeError("Client not authorised for the GUILD_MEMBERS intent.")
+                 if self._intents.GUILD_MESSAGES in self._intents and not (
+                     self.me.flags.GATEWAY_MESSAGE_CONTENT in self.me.flags
+                     or self.me.flags.GATEWAY_MESSAGE_CONTENT_LIMITED in self.me.flags
+                 ):
+                     log.critical("Client not authorised for the MESSAGE_CONTENT intent.")
+             elif self._intents.value != Intents.DEFAULT.value:
+                 raise RuntimeError("Client not authorised for any privileged intents.")
+
+             self.__register_events()
+
+             await self.__register_name_autocomplete()
+
+             ready = True
+         except Exception:
+             log.exception("Could not prepare the client:")
+         finally:
+             if ready:
+                 log.debug("Client is now ready.")
+                 await self._login()
 
 
 class ShardedClient(Client):
