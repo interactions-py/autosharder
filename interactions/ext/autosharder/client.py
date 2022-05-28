@@ -36,6 +36,8 @@ class ShardedClient(Client):
         data = await self._http.get_bot_gateway()
         return data[0]
 
+    _ready = _Client._ready
+
     def generate_shard_list(self) -> None:
         """
         Generates a list of shards.
