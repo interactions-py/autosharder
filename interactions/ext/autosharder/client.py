@@ -68,12 +68,12 @@ class ShardedClient(Client):
         self.generate_shard_list()
 
         for shard in self.shards:
-            if not self._clients:
-                _client = Client(token, shards=shard, **kwargs)
-            else:
-                _guild_cmds = self._clients[0]._Client__guild_commands
-                _global_cmds = self._clients[0]._Client__global_commands
-                _client = _Client(token, shards=shard, disable_sync=True, guild_cmds=_guild_cmds, global_cmds=_global_cmds)
+            if len(self._clients) == 0:
+                _client = Client(token, shards=shard, **kwargs)
+            else:
+                _guild = self.clients[0]._Client__guild_commands
+                _global = self._clients[0]._Client__global_commands
+                _client = _Client(token, guild_cmds=_guild, global_cmds=_global, disable_sync=True, **kwargs)
             self._clients.append(_client)
 
     async def _get_shard_count(self) -> int:
