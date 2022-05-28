@@ -10,7 +10,7 @@ from interactions.client.models.component import Button, Modal, SelectMenu
 class _Client(Client):
     """This class is intended to only be used as a 'dummy' client without sync behaviour"""
 
-    def __init__(self, token: str, guild_cmds, global_cmds, **kwargs):
+    def __init__(self, token: str, guild_cmds, global_cmds, **kwargs) -> None:
         super().__init__(token, **kwargs)
         self.__global_commands = global_cmds
         self.__guild_commands = guild_cmds
