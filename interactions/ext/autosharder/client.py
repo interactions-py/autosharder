@@ -1,9 +1,9 @@
 import asyncio
 from typing import Coroutine, Union
 
-from interactions.base import get_logger
 from interactions.api.models.flags import Intents
 from interactions.api.models.misc import MISSING, Snowflake
+from interactions.base import get_logger
 from interactions.client.bot import Client
 from interactions.client.models.command import ApplicationCommand
 from interactions.client.models.component import Button, Modal, SelectMenu
@@ -12,7 +12,7 @@ from interactions.client.models.component import Button, Modal, SelectMenu
 class _Client(Client):
     """This class is representing a dummy without sync behaviour, handling a shard without getting commands or making extra sync calls. Do not use this class."""
 
-    log = get_logger("Client") 
+    log = get_logger("Client")
 
     def __init__(self, token, guild_cmds, global_cmds, **kwargs):
         super().__init__(token, **kwargs)
