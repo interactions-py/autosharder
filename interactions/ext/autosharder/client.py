@@ -24,10 +24,11 @@ class ShardedClient(Client):
             if not self._clients:
                 _client = Client(token, shards=shard, **kwargs)
             else:
-                _guild = self.clients[0]._Client__guild_commands
+                _guild = self._clients[0]._Client__guild_commands
                 _global = self._clients[0]._Client__global_commands
+                kwargs["disable_sync"] = True
                 _client = _Client(
-                    token, guild_cmds=_guild, global_cmds=_global, disable_sync=True, **kwargs
+                    token, shards=shard, guild_cmds=_guild, global_cmds=_global, **kwargs
                 )
             self._clients.append(_client)
 

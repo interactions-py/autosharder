@@ -10,7 +10,7 @@ from interactions.client.decor import component as _component
 from interactions.client.enums import ApplicationCommandType, Locale
 from interactions.client.models.command import ApplicationCommand, Option
 from interactions.client.models.component import Button, Modal, SelectMenu
-from .dummy import *
+from .dummy import _Client
 
 class ShardedClient(Client):
     _clients: List[Client, _Client]
