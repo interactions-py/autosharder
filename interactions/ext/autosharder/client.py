@@ -44,11 +44,6 @@ class _Client(Client):
 
             self.__register_events()
 
-            if self._automate_sync:
-                await self.__sync()
-            else:
-                await self.__get_all_commands()
-            await self.__register_name_autocomplete()
 
             ready = True
         except Exception:
