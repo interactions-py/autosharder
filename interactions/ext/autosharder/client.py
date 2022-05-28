@@ -1,56 +1,12 @@
 import asyncio
 from typing import Coroutine, Union
 
-from interactions.api.models.flags import Intents
 from interactions.api.models.misc import MISSING, Snowflake
-from interactions.base import get_logger
 from interactions.client.bot import Client
 from interactions.client.models.command import ApplicationCommand
 from interactions.client.models.component import Button, Modal, SelectMenu
 
-
-class _Client(Client):
-    """This class is representing a dummy without sync behaviour, handling a shard without getting commands or making extra sync calls. Do not use this class."""
-
-    def __init__(self, token, guild_cmds, global_cmds, **kwargs):
-        super().__init__(token, **kwargs)
-        self.__guild_commands = guild_cmds
-        self.__global_commands = global_cmds
-
-    async def _ready(self) -> None:
-        log = get_logger("Client")
-        ready: bool = False
-
-        try:
-            if self.me.flags is not None:
-                # This can be None.
-                if self._intents.GUILD_PRESENCES in self._intents and not (
-                    self.me.flags.GATEWAY_PRESENCE in self.me.flags
-                    or self.me.flags.GATEWAY_PRESENCE_LIMITED in self.me.flags
-                ):
-                    raise RuntimeError("Client not authorised for the GUILD_PRESENCES intent.")
-                if self._intents.GUILD_MEMBERS in self._intents and not (
-                    self.me.flags.GATEWAY_GUILD_MEMBERS in self.me.flags
-                    or self.me.flags.GATEWAY_GUILD_MEMBERS_LIMITED in self.me.flags
-                ):
-                    raise RuntimeError("Client not authorised for the GUILD_MEMBERS intent.")
-                if self._intents.GUILD_MESSAGES in self._intents and not (
-                    self.me.flags.GATEWAY_MESSAGE_CONTENT in self.me.flags
-                    or self.me.flags.GATEWAY_MESSAGE_CONTENT_LIMITED in self.me.flags
-                ):
-                    log.critical("Client not authorised for the MESSAGE_CONTENT intent.")
-            elif self._intents.value != Intents.DEFAULT.value:
-                raise RuntimeError("Client not authorised for any privileged intents.")
-            await self.__register_name_autocomplete()
-            self.__register_events()
-
-            ready = True
-        except Exception:
-            log.exception("Could not prepare the client:")
-        finally:
-            if ready:
-                log.debug("Client is now ready.")
-                await self._login()
+from .dummy import _Client
 
 
 class ShardedClient(Client):
@@ -65,7 +21,7 @@ class ShardedClient(Client):
         self.generate_shard_list()
 
         for shard in self.shards:
-            if len(self._clients) == 0:
+            if not self._clients:
                 _client = Client(token, shards=shard, **kwargs)
             else:
                 _guild = self.clients[0]._Client__guild_commands
