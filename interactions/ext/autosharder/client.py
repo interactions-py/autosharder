@@ -41,7 +41,7 @@ class _Client(Client):
                     log.critical("Client not authorised for the MESSAGE_CONTENT intent.")
             elif self._intents.value != Intents.DEFAULT.value:
                 raise RuntimeError("Client not authorised for any privileged intents.")
-            await self.__register_name_autocomplete
+            await self.__register_name_autocomplete()
             self.__register_events()
 
             ready = True
