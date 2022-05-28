@@ -73,7 +73,9 @@ class ShardedClient(Client):
             else:
                 _guild = self.clients[0]._Client__guild_commands
                 _global = self._clients[0]._Client__global_commands
-                _client = _Client(token, guild_cmds=_guild, global_cmds=_global, disable_sync=True, **kwargs)
+                _client = _Client(
+                    token, guild_cmds=_guild, global_cmds=_global, disable_sync=True, **kwargs
+                )
             self._clients.append(_client)
 
     async def _get_shard_count(self) -> int:
