@@ -12,14 +12,13 @@ from interactions.client.models.component import Button, Modal, SelectMenu
 class _Client(Client):
     """This class is representing a dummy without sync behaviour, handling a shard without getting commands or making extra sync calls. Do not use this class."""
 
-    log = get_logger("Client")
-
     def __init__(self, token, guild_cmds, global_cmds, **kwargs):
         super().__init__(token, **kwargs)
         self.__guild_commands = guild_cmds
         self.__global_commands = global_cmds
 
     async def _ready(self) -> None:
+        log = get_logger("Client")
         ready: bool = False
 
         try:
