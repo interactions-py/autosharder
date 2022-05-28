@@ -44,7 +44,6 @@ class _Client(Client):
 
             self.__register_events()
 
-
             ready = True
         except Exception:
             log.exception("Could not prepare the client:")
