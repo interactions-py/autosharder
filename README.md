@@ -1,6 +1,9 @@
+![PyPI - Downloads](https://img.shields.io/pypi/dm/interactions-autosharder?color=blue&style=for-the-badge)
+
+
 # interactions-autosharder
 ____________________________
-![PyPI - Downloads](https://img.shields.io/pypi/dm/interactions-autosharder?color=blue&style=for-the-badge)
+
 You wanted to use `interactions.py` but were afraid of the lack of sharding? Or you did manual sharding but it sucks?
 Well, this will help you out! Install via `pip install interactions-autosharder` and do this in your main file:
 
