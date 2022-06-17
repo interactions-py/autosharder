@@ -125,7 +125,7 @@ class ShardedClient(Client):
 
         return decorator
 
-    def event(self, coro: Optional[Coroutine] = MISSING, **kwagrs):
+    def event(self, coro: Optional[Coroutine] = MISSING, **kwargs):
         def decorator(coro: Coroutine):
             for client in self._clients:
                 if client == self._clients[0]:
