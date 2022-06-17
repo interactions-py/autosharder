@@ -137,10 +137,7 @@ class ShardedClient(Client):
 
         return decorator
 
-    def event(
-        self, coro: Optional[Coroutine] = MISSING, **kwagrs
-    ) -> Callable[..., Any]:
-
+    def event(self, coro: Optional[Coroutine] = MISSING, **kwagrs) -> Callable[..., Any]:
         def decorator(coro: Coroutine):
             for client in self._clients:
                 if client == self._clients[0]:
@@ -148,7 +145,6 @@ class ShardedClient(Client):
                 client.event(**kwargs)(coro)
 
             return self._clients[0].event(**kwargs)(coro)
-
 
         if coro is not MISSING:
             name = kwargs.get("name", MISSING)
