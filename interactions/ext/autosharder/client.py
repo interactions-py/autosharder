@@ -140,16 +140,6 @@ class ShardedClient(Client):
     def event(
         self, coro: Optional[Coroutine] = MISSING, **kwagrs
     ) -> Callable[..., Any]:
-        """
-        A decorator for listening to events dispatched from the
-        Gateway.
-        :param coro: The coroutine of the event.
-        :type coro: Coroutine
-        :param name(?): The name of the event. If not given, this defaults to the coroutine's name.
-        :type name: Optional[str]
-        :return: A callable response.
-        :rtype: Callable[..., Any]
-        """
 
         def decorator(coro: Coroutine):
             for client in self._clients:
