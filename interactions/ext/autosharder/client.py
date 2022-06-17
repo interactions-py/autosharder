@@ -117,7 +117,7 @@ class ShardedClient(Client):
 
     def modal(self, modal: Union[Modal, str]):
         def decorator(coro: Coroutine) -> None:
-           for client in self._clients:
+            for client in self._clients:
                 if client == self._clients[0]:
                     continue
                 client.modal(modal)(coro)
