@@ -24,7 +24,7 @@ class ShardedClient(Client):
             if not self._clients:
                 _client = Client(token, shards=shard, **kwargs)
                 if not kwargs.get("disable_sync"):
-                    self._loop.run_until_complete(_client._Client__sync()
+                    self._loop.run_until_complete(_client._Client__sync())
                     _client._automate_sync = False
             else:
                 _guild = self._clients[0]._Client__guild_commands
