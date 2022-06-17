@@ -124,7 +124,7 @@ class ShardedClient(Client):
             return self._clients[0].modal(modal)(coro)
 
         return decorator
-    
+
         if coro is not MISSING:
             self._websocket._dispatch.register(
                 coro, name=name if name is not MISSING else coro.__name__
@@ -133,7 +133,7 @@ class ShardedClient(Client):
                 if client == self._clients[0]:
                     continue
                 client.modal(modal)(coro)
-            return self._clients[0].modal(modal)(coro) 
+            return self._clients[0].modal(modal)(coro)
 
         return decorator
 
