@@ -117,7 +117,7 @@ class ShardedClient(Client):
 
     def modal(self, modal: Union[Modal, str]):
         def decorator(coro: Coroutine) -> None:
-            for client in self._clients:
+           for client in self._clients:
                 if client == self._clients[0]:
                     continue
                 client.modal(modal)(coro)
@@ -129,6 +129,46 @@ class ShardedClient(Client):
             self._websocket._dispatch.register(
                 coro, name=name if name is not MISSING else coro.__name__
             )
-            return coro
+            for client in self._clients:
+                if client == self._clients[0]:
+                    continue
+                client.modal(modal)(coro)
+            return self._clients[0].modal(modal)(coro) 
+
+        return decorator
+
+    def event(
+        self, coro: Optional[Coroutine] = MISSING, **kwagrs
+    ) -> Callable[..., Any]:
+        """
+        A decorator for listening to events dispatched from the
+        Gateway.
+        :param coro: The coroutine of the event.
+        :type coro: Coroutine
+        :param name(?): The name of the event. If not given, this defaults to the coroutine's name.
+        :type name: Optional[str]
+        :return: A callable response.
+        :rtype: Callable[..., Any]
+        """
+
+        def decorator(coro: Coroutine):
+            for client in self._clients:
+                if client == self._clients[0]:
+                    continue
+                client.event(**kwargs)(coro)
+
+            return self._clients[0].event(**kwargs)(coro)
+
+
+        if coro is not MISSING:
+            name = kwargs.get("name", MISSING)
+            self._websocket._dispatch.register(
+                coro, name=name if name is not MISSING else coro.__name__
+            )
+            for client in self._clients:
+                if client == self._clients[0]:
+                    continue
+                client.event(**kwargs)(coro)
+            return self._clients[0].event(**kwagrs)(coro)
 
         return decorator
