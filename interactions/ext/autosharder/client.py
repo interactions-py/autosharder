@@ -143,6 +143,6 @@ class ShardedClient(Client):
                 if client == self._clients[0]:
                     continue
                 client.event(**kwargs)(coro)
-            return self._clients[0].event(**kwagrs)(coro)
+            return self._clients[0].event(**kwargs)(coro)
 
         return decorator
