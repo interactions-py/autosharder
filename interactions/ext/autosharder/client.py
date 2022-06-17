@@ -1,5 +1,5 @@
 import asyncio
-from typing import Coroutine, Union
+from typing import Coroutine, Union, Optional
 
 from interactions.api.models.misc import MISSING, Snowflake
 from interactions.client.bot import Client
@@ -125,19 +125,7 @@ class ShardedClient(Client):
 
         return decorator
 
-        if coro is not MISSING:
-            self._websocket._dispatch.register(
-                coro, name=name if name is not MISSING else coro.__name__
-            )
-            for client in self._clients:
-                if client == self._clients[0]:
-                    continue
-                client.modal(modal)(coro)
-            return self._clients[0].modal(modal)(coro)
-
-        return decorator
-
-    def event(self, coro: Optional[Coroutine] = MISSING, **kwagrs) -> Callable[..., Any]:
+    def event(self, coro: Optional[Coroutine] = MISSING, **kwagrs):
         def decorator(coro: Coroutine):
             for client in self._clients:
                 if client == self._clients[0]:
