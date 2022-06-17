@@ -1,5 +1,5 @@
 import asyncio
-from typing import Coroutine, Union, Optional
+from typing import Coroutine, Optional, Union
 
 from interactions.api.models.misc import MISSING, Snowflake
 from interactions.client.bot import Client
