@@ -9,10 +9,8 @@ class _Client(Client):
     commands or making extra sync calls. Do not use this class.
     """
 
-    def __init__(self, token, guild_cmds, global_cmds, **kwargs):
+    def __init__(self, token, **kwargs):
         super().__init__(token, **kwargs)
-        self.__guild_commands = guild_cmds
-        self.__global_commands = global_cmds
 
     async def _ready(self) -> None:
         log = get_logger("Client")
@@ -39,6 +37,7 @@ class _Client(Client):
             elif self._intents.value != Intents.DEFAULT.value:
                 raise RuntimeError("Client not authorised for any privileged intents.")
 
+            await self.__get_all_commands()
             await self.__register_name_autocomplete()
             self.__register_events()
 
