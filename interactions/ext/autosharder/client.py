@@ -65,9 +65,7 @@ class ShardedClient(Client):
         **kwargs,
     ):
         def decorator(coro: Coroutine):
-            for client in self._clients:
-                if client == self._clients[0]:
-                    continue
+            for client in self._clients[1:]:
                 client.command(**kwargs)(coro)
 
             return self._clients[0].command(**kwargs)(coro)
@@ -79,9 +77,7 @@ class ShardedClient(Client):
         **kwargs,
     ):
         def decorator(coro: Coroutine):
-            for client in self._clients:
-                if client == self._clients[0]:
-                    continue
+            for client in self._clients[1:]:
                 client.message_command(**kwargs)(coro)
             return self._clients[0].message_command(**kwargs)(coro)
 
@@ -92,9 +88,7 @@ class ShardedClient(Client):
         **kwargs,
     ):
         def decorator(coro: Coroutine):
-            for client in self._clients:
-                if client == self._clients[0]:
-                    continue
+            for client in self._clients[1:]:
                 client.user_command(**kwargs)(coro)
             return self._clients[0].user_command(**kwargs)(coro)
 
@@ -102,9 +96,7 @@ class ShardedClient(Client):
 
     def component(self, component: Union[Button, SelectMenu, str]):
         def decorator(coro: Coroutine):
-            for client in self._clients:
-                if client == self._clients[0]:
-                    continue
+            for client in self._clients[1:]:
                 client.component(component)(coro)
             return self._clients[0].component(component)(coro)
 
@@ -112,9 +104,7 @@ class ShardedClient(Client):
 
     def autocomplete(self, command: Union[ApplicationCommand, int, str, Snowflake], name: str):
         def decorator(coro: Coroutine) -> None:
-            for client in self._clients:
-                if client == self._clients[0]:
-                    continue
+            for client in self._clients[1:]:
                 client.autocomplete(command, name)(coro)
             return self._clients[0].autocomplete(command, name)(coro)
 
@@ -122,9 +112,7 @@ class ShardedClient(Client):
 
     def modal(self, modal: Union[Modal, str]):
         def decorator(coro: Coroutine) -> None:
-            for client in self._clients:
-                if client == self._clients[0]:
-                    continue
+            for client in self._clients[1:]:
                 client.modal(modal)(coro)
             return self._clients[0].modal(modal)(coro)
 
@@ -132,21 +120,13 @@ class ShardedClient(Client):
 
     def event(self, coro: Optional[Coroutine] = MISSING, **kwargs):
         def decorator(coro: Coroutine):
-            for client in self._clients:
-                if client == self._clients[0]:
-                    continue
+            for client in self._clients[1:]:
                 client.event(**kwargs)(coro)
 
             return self._clients[0].event(**kwargs)(coro)
 
         if coro is not MISSING:
-            name = kwargs.get("name", MISSING)
-            self._websocket._dispatch.register(
-                coro, name=name if name is not MISSING else coro.__name__
-            )
-            for client in self._clients:
-                if client == self._clients[0]:
-                    continue
+            for client in self._clients[1:]:
                 client.event(**kwargs)(coro)
             return self._clients[0].event(**kwargs)(coro)
 
