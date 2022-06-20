@@ -23,16 +23,9 @@ class ShardedClient(Client):
         for shard in self.shards:
             if not self._clients:
                 _client = Client(token, shards=shard, **kwargs)
-                if not kwargs.get("disable_sync"):
-                    self._loop.run_until_complete(_client._Client__sync())
-                    _client._automate_sync = False
             else:
-                _guild = self._clients[0]._Client__guild_commands
-                _global = self._clients[0]._Client__global_commands
                 kwargs["disable_sync"] = True
-                _client = _Client(
-                    token, shards=shard, guild_cmds=_guild, global_cmds=_global, **kwargs
-                )
+                _client = _Client(token, shards=shard, **kwargs)
             self._clients.append(_client)
 
     @property
@@ -44,7 +37,8 @@ class ShardedClient(Client):
         data = await self._http.get_bot_gateway()
         return data[0]
 
-    _ready = _Client._ready
+    async def _ready(self) -> None:
+        await self._login()
 
     def generate_shard_list(self) -> None:
         """
@@ -54,6 +48,10 @@ class ShardedClient(Client):
             self.shards.append([shard, self._shard_count])
 
     async def _login(self) -> None:
+
+        if self._clients[0]._automate_sync:
+            await self._clients[0]._Client__sync()
+            self._clients._automate_sync = False
 
         _funcs = [client._ready() for client in self._clients]
         gathered = asyncio.gather(*_funcs)
