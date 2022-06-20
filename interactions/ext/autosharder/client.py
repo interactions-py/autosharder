@@ -35,6 +35,11 @@ class ShardedClient(Client):
                 )
             self._clients.append(_client)
 
+    @property
+    def latency(self) -> float:
+        _latencies = [client.latency for client in self._clients]
+        return sum(_latencies) / len(_latencies)
+
     async def _get_shard_count(self) -> int:
         data = await self._http.get_bot_gateway()
         return data[0]
