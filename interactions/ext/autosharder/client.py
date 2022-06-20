@@ -1,5 +1,5 @@
 import asyncio
-from typing import Coroutine, Union
+from typing import Coroutine, Optional, Union
 
 from interactions.api.models.misc import MISSING, Snowflake
 from interactions.client.bot import Client
@@ -23,6 +23,9 @@ class ShardedClient(Client):
         for shard in self.shards:
             if not self._clients:
                 _client = Client(token, shards=shard, **kwargs)
+                if not kwargs.get("disable_sync"):
+                    self._loop.run_until_complete(_client._Client__sync())
+                    _client._automate_sync = False
             else:
                 _guild = self._clients[0]._Client__guild_commands
                 _global = self._clients[0]._Client__global_commands
@@ -47,7 +50,7 @@ class ShardedClient(Client):
 
     async def _login(self) -> None:
 
-        _funcs = [self._loop.create_task(client._ready()) for client in self._clients]
+        _funcs = [client._ready() for client in self._clients]
         gathered = asyncio.gather(*_funcs)
         while not self._websocket._closed:
             await gathered
@@ -119,5 +122,27 @@ class ShardedClient(Client):
                     continue
                 client.modal(modal)(coro)
             return self._clients[0].modal(modal)(coro)
+
+        return decorator
+
+    def event(self, coro: Optional[Coroutine] = MISSING, **kwargs):
+        def decorator(coro: Coroutine):
+            for client in self._clients:
+                if client == self._clients[0]:
+                    continue
+                client.event(**kwargs)(coro)
+
+            return self._clients[0].event(**kwargs)(coro)
+
+        if coro is not MISSING:
+            name = kwargs.get("name", MISSING)
+            self._websocket._dispatch.register(
+                coro, name=name if name is not MISSING else coro.__name__
+            )
+            for client in self._clients:
+                if client == self._clients[0]:
+                    continue
+                client.event(**kwargs)(coro)
+            return self._clients[0].event(**kwargs)(coro)
 
         return decorator
