@@ -51,7 +51,7 @@ class ShardedClient(Client):
 
         if self._clients[0]._automate_sync:
             await self._clients[0]._Client__sync()
-            self._clients._automate_sync = False
+            self._clients[0]._automate_sync = False
 
         _funcs = [client._ready() for client in self._clients]
         gathered = asyncio.gather(*_funcs)
