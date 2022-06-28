@@ -2,6 +2,8 @@ from interactions.api.models.flags import Intents
 from interactions.base import get_logger
 from interactions.client.bot import Client
 
+__all__ = "_Client"
+
 
 class _Client(Client):
     """
