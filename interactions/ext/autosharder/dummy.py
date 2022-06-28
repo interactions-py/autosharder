@@ -2,10 +2,10 @@ from interactions.api.models.flags import Intents
 from interactions.base import get_logger
 from interactions.client.bot import Client
 
-__all__ = "_Client"
+__all__ = "DummyClient"
 
 
-class _Client(Client):
+class DummyClient(Client):
     """
     This class is representing a dummy without sync behaviour, handling a shard without getting
     commands or making extra sync calls. Do not use this class.

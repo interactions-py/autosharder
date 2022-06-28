@@ -1,5 +1,5 @@
 from interactions.client.bot import Client
 
-class _Client(Client):
+class DummyClient(Client):
     def __init__(self, token: str, **kwargs) -> None: ...
     async def _ready(self) -> None: ...
