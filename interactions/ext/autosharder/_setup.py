@@ -58,6 +58,7 @@ def shard(
         _clients.append(__client)
     _replacer._clients = _clients
     _replacer._websocket._dispatch.events = _client._websocket._dispatch.events
+    _replacer._Client__command_coroutines = _client._Client__command_coroutines
     setattr(_client, "_clients", _clients)
     setattr(_client, "start", _replacer.start)
     setattr(_client, "_ready", _replacer._ready)
