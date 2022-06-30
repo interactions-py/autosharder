@@ -1,12 +1,13 @@
 import itertools
 from asyncio import gather
-from typing import List
+from typing import List, Optional
 
+from interactions import ClientPresence
 from interactions.api.models.flags import Intents
 from interactions.base import get_logger
-from interactions.client.bot import Client
+from interactions.client.bot import Client, Extension
 
-__all__ = ("DummyClient", "MethodReplacer")
+__all__ = ("DummyClient", "AutoShardedClient")
 
 
 class DummyClient(Client):
@@ -58,10 +59,16 @@ class DummyClient(Client):
                 await self._login()
 
 
-class MethodReplacer(Client):
+class AutoShardedClient(Client):
     def __init__(self, token: str, **kwargs):
         super().__init__(token, **kwargs)
         self._clients: List[DummyClient] = []
+
+    @property
+    def total_latency(self) -> float:
+        _latencies = [getattr(self, "latency", 0.0)]
+        _latencies.extend(getattr(_client, "latency", 0.0) for _client in self._clients)
+        return sum(_latencies) / len(_latencies)
 
     async def __sync(self) -> None:
         await super()._Client__sync()
@@ -71,6 +78,11 @@ class MethodReplacer(Client):
             self._loop.run_until_complete(self.__sync())
             self._automate_sync = False
         self._loop.run_until_complete(self.__ready())
+
+    async def change_presence(self, presence: ClientPresence) -> None:
+        await super().change_presence(presence)
+        for client in self._clients:
+            await client.change_presence(presence)
 
     async def _ready(self) -> None:
         await self._login()
@@ -116,9 +128,41 @@ class MethodReplacer(Client):
         for attrib, client in itertools.product(self._websocket._dispatch.__slots__, self._clients):
             setattr(client._websocket._dispatch, attrib, getattr(self._websocket._dispatch, attrib))
 
-        if len(self._clients) <= 15:
-            tasks = [self._ready()]
-            tasks.extend(client._ready() for client in self._clients)
+        # if len(self._clients) <= 15:
+        tasks = [self._ready()]
+        tasks.extend(client._ready() for client in self._clients)
 
-            gathered = gather(*tasks)
-            await gathered
+        gathered = gather(*tasks)
+        await gathered
+
+        # else:
+        #     amount = (len(self._clients) + 1) // 16
+        #     tasks = [[] for _ in range(amount)]
+        #     tasks[0].append(self._ready())
+        #     i = _i = 16
+        #     tasks[0].extend(self._clients[:i])
+        #     i += 15
+        #     for c in range(1, len(tasks)):
+        #         tasks[c].extend(self._clients[_i:i])
+        #         _i = i
+        #         i += 16
+        #
+        #     for _tasks in tasks[1:]:
+        #         _gathered = gather(*tasks)
+        #         self._loop.call_later(30, _call_gathered(_gathered))
+
+    def remove(self, name: str, package: Optional[str] = None) -> None:
+        super().remove(name, package)
+
+        for attrib, client in itertools.product(self._websocket._dispatch.__slots__, self._clients):
+            setattr(client._websocket._dispatch, attrib, getattr(self._websocket._dispatch, attrib))
+
+    def load(
+        self, name: str, package: Optional[str] = None, *args, **kwargs
+    ) -> Optional[Extension]:
+        extension = super().load(name, package, *args, **kwargs)
+
+        for attrib, client in itertools.product(self._websocket._dispatch.__slots__, self._clients):
+            setattr(client._websocket._dispatch, attrib, getattr(self._websocket._dispatch, attrib))
+
+        return extension

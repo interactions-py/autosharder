@@ -2,11 +2,10 @@ from typing import TypeVar, Union
 
 from interactions.api.models.misc import MISSING
 from interactions.client.bot import Client as _Client
-from interactions.client.bot import Extension
 
-from .dummy import DummyClient, MethodReplacer
+from .dummy import AutoShardedClient, DummyClient
 
-__all__ = ("shard", "shard_extension")
+__all__ = ("shard",)
 
 Client = TypeVar("Client", bound=_Client)
 
@@ -24,10 +23,10 @@ def generate_shard_list(shard_count: int) -> list:
 
 
 def shard(
-    _client: Client, shard_count: int = MISSING, max_shard_count: int = MISSING
-) -> Union[Client, MethodReplacer]:
+    _client: _Client, shard_count: int = MISSING, max_shard_count: int = MISSING
+) -> Union[Client, AutoShardedClient]:
     # sourcery skip: compare-via-equals
-    _replacer = MethodReplacer(intents=_client._intents, token=_client._token)
+    _replacer = AutoShardedClient(intents=_client._intents, token=_client._token)
 
     if shard_count and shard_count != MISSING and isinstance(shard_count, int):
         _shard_count = shard_count
@@ -59,14 +58,14 @@ def shard(
     _replacer._clients = _clients
     _replacer._websocket._dispatch.events = _client._websocket._dispatch.events
     _replacer._Client__command_coroutines = _client._Client__command_coroutines
+    _replacer._Client__name_autocomplete = _client._Client__name_autocomplete
     setattr(_client, "_clients", _clients)
     setattr(_client, "start", _replacer.start)
     setattr(_client, "_ready", _replacer._ready)
-    setattr(_client, "_Client__ready", _replacer._MethodReplacer__ready)
-    setattr(_client, "_Client__login", _replacer._MethodReplacer__login)
+    setattr(_client, "_Client__ready", _replacer._AutoShardedClient__ready)
+    setattr(_client, "_Client__login", _replacer._AutoShardedClient__login)
+    setattr(_client, "remove", _replacer.remove)
+    setattr(_client, "total_latency", _replacer.total_latency)
+    setattr(_client, "load", _replacer.load)
 
     return _client
-
-
-def shard_extension(_extension: Extension):
-    ...
