@@ -11,9 +11,18 @@ You wanted to use `interactions.py` but were afraid of the lack of sharding? Or 
 Well, this will help you out! Install via `pip install interactions-autosharder` and do this in your main file:
 
 ```python
-from interactions.ext.autosharder import ShardedClient
+from interactions.ext.autosharder import shard
+from interactions import Client
 
-bot = ShardedClient("the_arguments_you_gave_the_normal_client")
+bot = Client(...)
+
+... # all your code here
+
+shard(bot)
+
+bot.start()
+
+
 ```
 It will automatically get the needed shard count and create the shards. Optionally, insert the `shard_count` parameter
 and set it to the amount of shards you want!
