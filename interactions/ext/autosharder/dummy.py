@@ -128,28 +128,31 @@ class AutoShardedClient(Client):
         for attrib, client in itertools.product(self._websocket._dispatch.__slots__, self._clients):
             setattr(client._websocket._dispatch, attrib, getattr(self._websocket._dispatch, attrib))
 
-        # if len(self._clients) <= 15:
-        tasks = [self._ready()]
-        tasks.extend(client._ready() for client in self._clients)
+        if len(self._clients) <= 15:
+            tasks = [self._ready()]
+            tasks.extend(client._ready() for client in self._clients)
 
-        gathered = gather(*tasks)
-        await gathered
+            gathered = gather(*tasks)
+            await gathered
 
-        # else:
-        #     amount = (len(self._clients) + 1) // 16
-        #     tasks = [[] for _ in range(amount)]
-        #     tasks[0].append(self._ready())
-        #     i = _i = 16
-        #     tasks[0].extend(self._clients[:i])
-        #     i += 15
-        #     for c in range(1, len(tasks)):
-        #         tasks[c].extend(self._clients[_i:i])
-        #         _i = i
-        #         i += 16
-        #
-        #     for _tasks in tasks[1:]:
-        #         _gathered = gather(*tasks)
-        #         self._loop.call_later(30, _call_gathered(_gathered))
+        else:
+            amount = (len(self._clients) + 1) // 16
+            tasks = [[] for _ in range(amount)]
+            tasks[0].append(self._ready())
+            i = _i = 16
+            tasks[0].extend(self._clients[:i])
+            i += 15
+            for c in range(1, len(tasks)):
+                tasks[c].extend(self._clients[_i:i])
+                _i = i
+                i += 16
+
+            setattr(self, "gather_tasks", [gather(*_tasks) for _tasks in tasks])
+            for i in range(len(self.gather_tasks)):
+                self._loop.call_later(15 * i, self.run_gathered)
+
+    def run_gathered(self):
+        self._loop.create_task(self.gather_tasks.pop(0))
 
     def remove(self, name: str, package: Optional[str] = None) -> None:
         super().remove(name, package)

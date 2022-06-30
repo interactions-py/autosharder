@@ -66,6 +66,7 @@ def shard(
     setattr(_client, "_Client__login", _replacer._AutoShardedClient__login)
     setattr(_client, "remove", _replacer.remove)
     setattr(_client, "total_latency", _replacer.total_latency)
+    setattr(_client, "run_gathered", _replacer.run_gathered)
     setattr(_client, "load", _replacer.load)
 
     return _client
