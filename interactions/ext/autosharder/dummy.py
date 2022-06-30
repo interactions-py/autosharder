@@ -2,10 +2,11 @@ import itertools
 from asyncio import gather
 from typing import List, Optional
 
-from interactions import ClientPresence
 from interactions.api.models.flags import Intents
 from interactions.base import get_logger
 from interactions.client.bot import Client, Extension
+
+from interactions import ClientPresence
 
 __all__ = ("DummyClient", "AutoShardedClient")
 
